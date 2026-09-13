@@ -565,11 +565,7 @@ class GiveawayManager:
             return
 
         current = now_ts()
-
-        ready_at = (
-            winner.get("reward_ready_at")
-            or 0
-        )
+        ready_at = winner.get("reward_ready_at") or 0
 
         if ready_at > current:
             await interaction.response.send_message(
@@ -590,37 +586,12 @@ class GiveawayManager:
             )
             return
 
-        channel_id = (
-            self.settings.reward_claim_channel_id
-        )
+        channel_id = self.settings.reward_claim_channel_id
 
         if not channel_id:
             await interaction.response.send_message(
                 f"{CROSS} Reward claim channel is not configured. "
                 "Please contact staff.",
-                ephemeral=True,
-            )
-            return
-
-        channel = self.bot.get_channel(
-            channel_id
-        )
-
-        if channel is None:
-            try:
-                channel = await self.bot.fetch_channel(
-                    channel_id
-                )
-            except discord.HTTPException:
-                channel = None
-
-        if not isinstance(
-            channel,
-            discord.abc.Messageable,
-        ):
-            await interaction.response.send_message(
-                f"{CROSS} I could not access the reward claim "
-                "channel. Please contact staff.",
                 ephemeral=True,
             )
             return
@@ -649,57 +620,16 @@ class GiveawayManager:
             )
             return
 
-        server_name = await self._server_name(
-            giveaway["guild_id"]
+        channel_url = (
+            f"https://discord.com/channels/"
+            f"{giveaway['guild_id']}/"
+            f"{channel_id}"
         )
-
-        notification = (
-            "🎁 **Reward Claim**\n\n"
-            f"<@{user_id}> has claimed the giveaway reward.\n\n"
-            f"**Giveaway:** {giveaway['name']}\n"
-            f"**Prize:** {giveaway['prize']}\n"
-            f"**Server:** {server_name}\n"
-            f"**Hosted By:** <@{giveaway['host_id']}>"
-        )
-
-        try:
-            await channel.send(
-                notification,
-                allowed_mentions=(
-                    discord.AllowedMentions(users=True)
-                ),
-            )
-
-        except (
-            discord.Forbidden,
-            discord.HTTPException,
-        ):
-            await self.db.execute(
-                """
-                UPDATE winners
-                SET claimed=0,
-                    reward_status='pending'
-                WHERE giveaway_id=?
-                  AND user_id=?
-                  AND claimed=1
-                  AND reward_status='claimed'
-                """,
-                (
-                    giveaway_id,
-                    user_id,
-                ),
-            )
-
-            await interaction.response.send_message(
-                f"{CROSS} I could not notify staff about the claim. "
-                "Please try again.",
-                ephemeral=True,
-            )
-            return
 
         await interaction.response.send_message(
-            f"{CHECK} Your reward claim has been sent "
-            "to the giveaway staff.",
+            f"{CHECK} Your reward has been claimed.\\n\\n"
+            f"Go to the reward channel:\\n"
+            f"{channel_url}",
             ephemeral=True,
         )
 
