@@ -626,10 +626,27 @@ class GiveawayManager:
             f"{channel_id}"
         )
 
+        view = discord.ui.LayoutView(timeout=None)
+
+        row = discord.ui.ActionRow()
+        row.add_item(
+            discord.ui.Button(
+                label="Go to Reward Channel",
+                emoji="🎁",
+                style=discord.ButtonStyle.link,
+                url=channel_url,
+            )
+        )
+
+        view.add_item(
+            discord.ui.Container(
+                row,
+                accent_colour=discord.Colour.green(),
+            )
+        )
+
         await interaction.response.send_message(
-            f"{CHECK} Your reward has been claimed.\\n\\n"
-            f"Go to the reward channel:\\n"
-            f"{channel_url}",
+            view=view,
             ephemeral=True,
         )
 
