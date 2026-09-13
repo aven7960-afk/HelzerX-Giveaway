@@ -19,6 +19,7 @@ class Settings:
     winner_image_url: str | None
     ticket_category_id: int | None
     log_channel_id: int | None
+    reward_claim_channel_id: int | None
     default_reward_delay: int
     claim_window_seconds: int
     sync_guild_id: int | None
@@ -40,6 +41,7 @@ class Settings:
             winner_image_url=os.getenv("WINNER_IMAGE_URL", "").strip() or None,
             ticket_category_id=optional_int("TICKET_CATEGORY_ID"),
             log_channel_id=optional_int("LOG_CHANNEL_ID"),
+            reward_claim_channel_id=optional_int("REWARD_CLAIM_CHANNEL_ID"),
             default_reward_delay=_int_env("DEFAULT_REWARD_DELAY", 0),
             claim_window_seconds=max(60, _int_env("CLAIM_WINDOW_SECONDS", 86400)),
             sync_guild_id=optional_int("SYNC_GUILD_ID"),
